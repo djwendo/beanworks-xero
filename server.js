@@ -46,7 +46,7 @@ app.get('/accounts', (req, res) => {
 });
 
 app.get('/contacts', (req, res) => {
-  res.send([ vendorList ]);
+  res.send( vendorList.Contacts );
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
