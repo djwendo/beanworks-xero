@@ -7,7 +7,7 @@
     "react-dom": "^16.4.0",
     "react-scripts": "1.1.4"
   },
-  "proxy": "http://localhost:3001/",
+  "proxy": "https://api.xero.com/api.xro/2.0",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
