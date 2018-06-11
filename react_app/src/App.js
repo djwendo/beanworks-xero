@@ -3,45 +3,86 @@ import React, { Component } from 'react';
 import logo from './Beanworks Logo.png';
 import './App.css';
 
+const vendorList = [];
+const accountList = [];
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        contacts: [],
+        // vendors: vendorList,
         isLoading: false,
+        showVendors: '',
+        showAccounts: '',
     };
     this.handleClick = this.handleClick.bind(this);
+    this.listVendors = this.listVendors.bind(this);
+    this.listAccounts = this.listAccounts.bind(this);
+
   }
 
   componentDidMount() {
-    this.setState({ isLoading: true });
-    console.log('fetching contacts')
-    fetch('/contacts')
-      .then(response => response.json())
-      .then(data => this.setState({ contacts: data, isLoading: false }));
-    console.log('contacts', this.state.contacts);
-
+    console.log('fetching vendors')
+    this.callApi("contacts")
+      .then(function(data) { 
+        data.forEach(contact => {
+          if (contact.IsSupplier === true) {
+            vendorList.push(contact)
+          }
+        })
+      })
+      .catch(err => console.log(err))
+    // fetch('/contacts')
+    //   .then(function(response) {
+    //     return response.json();
+    //   })
+    //   .then(function(data) {
+    //     data.forEach(contact => {
+    //       contactList.push(contact)
+    //     })
+    //   });
+    console.log('vendors!', vendorList)
+    this.callApi("accounts")
+    .then(function(data) { 
+      data.forEach(account => {
+        if (account.Type === "EXPENSE") {
+          accountList.push(account)
+        }
+      })
+    })
+    .catch(err => console.log(err))
+ 
+  console.log('accounts!', accountList)
   };
-  //   this.callApi()
-  //     .then(res => this.setState({ invoices: [] }))
-  //     .catch(err => console.log(err));
-  // }
+    
+  callApi = async (link) => {
+    const response = await fetch(`/${link}`);
+    const body = await response.json();
 
-  // callApi = async () => {
-  //   const invoices = await fetch('/invoices');
-  //   console.log('response', invoices);
-  //   const body = await invoices.json();
-  //   console.log('body', body)
+    if (response.status !== 200) throw Error(body.message);
 
-  //   if (invoices.status !== 200) throw Error(body.message);
-
-  //   return body;
-  // };
+    return body;
+  };
 
   handleClick(e) {
     e.preventDefault();
     console.log('The link was clicked.');
+  }
+
+  listVendors(e) {
+    e.preventDefault();
+    console.log('Listing Vendors');
+    this.setState({showVendors: vendorList.map((vendor) =>
+      <li key={vendor.ContactID}>{vendor.Name}</li>
+    )})
+  }
+
+  listAccounts(e) {
+    e.preventDefault();
+    console.log('Listing Accounts');
+    this.setState({showAccounts: accountList.map((account) =>
+      <li key={account.AccountID}>{account.Code} - {account.Name}</li>
+    )})
   }
 
   render() {
@@ -52,12 +93,14 @@ class App extends Component {
         </header>
         <div className="App-body">
         <div className="Vendor-Section">
-          <button className="View-Button" onClick={this.handleClick}>View List of Vendors</button>
+          <button className="View-Button" onClick={this.listVendors}>View List of Vendors</button>
           <button className="Save-Button" onClick={this.handleClick}>Save List of Vendors to Disc</button>
+          <ul>{this.state.showVendors}</ul>
         </div>
         <div className="Account-Section">
-          <button className="View-Button" onClick={this.handleClick}>View List of Accounts</button>
+          <button className="View-Button" onClick={this.listAccounts}>View List of Accounts</button>
           <button className="Save-Button" onClick={this.handleClick}>Save List of Accounts to Disc</button>
+          <ul>{this.state.showAccounts}</ul>
         </div>
         </div>
       </div>

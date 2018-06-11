@@ -42,11 +42,11 @@ app.get('/invoices', (req, res) => {
 });
 
 app.get('/accounts', (req, res) => {
-  res.send([ accountList ]);
+  res.json( accountList.Accounts );
 });
 
 app.get('/contacts', (req, res) => {
-  res.send( vendorList.Contacts );
+  res.json( vendorList.Contacts );
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
