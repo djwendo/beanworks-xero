@@ -1,0 +1,6 @@
+{
+  "appType" : "private",
+  "consumerKey": "CONSUMER KEY NEEDED",
+  "consumerSecret": "CONSUMER SECRET NEEDED",
+  "privateKeyPath": "../privatekey.pem"
+}
