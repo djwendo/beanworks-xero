@@ -63,14 +63,14 @@ class App extends Component {
   downloadVendors(){
     this.callApi('contacts')
       .then(data => {
-        this.downloadFile(JSON.stringify(data), 'vendors.json');
+        this.downloadFile(JSON.stringify(data), 'vendor-details.json');
       })
   }
 
   downloadAccounts(){
     this.callApi('accounts')
       .then(data => {
-        this.downloadFile(JSON.stringify(data), 'accounts.json');
+        this.downloadFile(JSON.stringify(data), 'account-details.json');
       })
   }
 
