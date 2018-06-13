@@ -8,45 +8,16 @@ const config = require('./config.json');
 
 let xero = new XeroClient(config);
 
-let invoiceList;
+app.get('/accounts', async (req, res) => {
+  const {Accounts} = await xero.accounts.get({where: 'Type=="EXPENSE"'});
 
-let accountList;
-
-let vendorList;
- 
-(async () => {
-  
-  invoiceList = await xero.invoices.get();
-  return invoiceList;
-
-})();
-
-(async () => {
- 
-  accountList = await xero.accounts.get();
-  return accountList;
-
-})();
-
-(async () => {
- 
-  vendorList = await xero.contacts.get();
-  return vendorList;
-
-})();
-
-
-
-app.get('/invoices', (req, res) => {
-  res.send([ invoiceList ]);
+  res.json( Accounts );
 });
 
-app.get('/accounts', (req, res) => {
-  res.json( accountList.Accounts );
-});
-
-app.get('/contacts', (req, res) => {
-  res.json( vendorList.Contacts );
+app.get('/contacts', async (req, res) => {
+  const {Contacts} = await xero.contacts.get({where: 'IsSupplier==true'})
+ 
+  res.json( Contacts );
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

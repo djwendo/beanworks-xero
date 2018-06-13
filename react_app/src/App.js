@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-// import logo from './logo.svg';
 import logo from './Beanworks Logo.png';
 import './App.css';
+import { CSVLink } from 'react-csv';
 
 const vendorList = [];
 const accountList = [];
@@ -10,52 +10,36 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        // vendors: vendorList,
         isLoading: false,
         showVendors: '',
         showAccounts: '',
     };
-    this.handleClick = this.handleClick.bind(this);
     this.listVendors = this.listVendors.bind(this);
     this.listAccounts = this.listAccounts.bind(this);
-
+    this.downloadContacts = this.downloadContacts.bind(this);
+    // this.downloadFile = this.downloadFile.bind(this);
   }
 
   componentDidMount() {
-    console.log('fetching vendors')
+   
     this.callApi("contacts")
       .then(function(data) { 
-        data.forEach(contact => {
-          if (contact.IsSupplier === true) {
-            vendorList.push(contact)
-          }
+        data.forEach(vendor => {
+          vendorList.push(vendor)
         })
       })
-      .catch(err => console.log(err))
-    // fetch('/contacts')
-    //   .then(function(response) {
-    //     return response.json();
-    //   })
-    //   .then(function(data) {
-    //     data.forEach(contact => {
-    //       contactList.push(contact)
-    //     })
-    //   });
-    console.log('vendors!', vendorList)
+      .catch(err => console.log(err));
+
     this.callApi("accounts")
-    .then(function(data) { 
-      data.forEach(account => {
-        if (account.Type === "EXPENSE") {
+      .then(function(data) { 
+        data.forEach(account => {
           accountList.push(account)
-        }
       })
-    })
-    .catch(err => console.log(err))
- 
-  console.log('accounts!', accountList)
-  };
+      })
+      .catch(err => console.log(err));
+  }
     
-  callApi = async (link) => {
+  async callApi(link) {
     const response = await fetch(`/${link}`);
     const body = await response.json();
 
@@ -64,47 +48,68 @@ class App extends Component {
     return body;
   };
 
-  handleClick(e) {
-    e.preventDefault();
-    console.log('The link was clicked.');
-  }
-
   listVendors(e) {
     e.preventDefault();
-    console.log('Listing Vendors');
-    this.setState({showVendors: vendorList.map((vendor) =>
-      <li key={vendor.ContactID}>{vendor.Name}</li>
+    this.setState({showVendors: vendorList.map((vendor) => 
+      <li key={vendor.ContactID}><strong>{vendor.Name}</strong> {vendor.Balances !== undefined ? `(Outstanding Balance: $${vendor.Balances.AccountsPayable.Outstanding})`:''}</li>
     )})
   }
 
   listAccounts(e) {
     e.preventDefault();
-    console.log('Listing Accounts');
     this.setState({showAccounts: accountList.map((account) =>
-      <li key={account.AccountID}>{account.Code} - {account.Name}</li>
+      <li key={account.AccountID}><em>{account.Code}</em> - <strong>{account.Name}</strong></li>
     )})
   }
+  downloadContacts(){
+    this.callApi('contacts')
+      .then(data => {
+        this.downloadFile(JSON.stringify(data), 'contacts.json');
+      })
+  }
+  downloadFile(dataString, filename) {
+    const link = document.createElement('a');
+    link.href = 'data:text/plain;charset=utf-8,' + dataString;
+    link.download = filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    link.parentElement.removeChild(link);
+  }
+  // add to return: <button onClick={() => this.downloadFile('http://localhost:3001/contacts')}>Download JSON</button>
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-        </header>
-        <div className="App-body">
-        <div className="Vendor-Section">
-          <button className="View-Button" onClick={this.listVendors}>View List of Vendors</button>
-          <button className="Save-Button" onClick={this.handleClick}>Save List of Vendors to Disc</button>
-          <ul>{this.state.showVendors}</ul>
-        </div>
-        <div className="Account-Section">
-          <button className="View-Button" onClick={this.listAccounts}>View List of Accounts</button>
-          <button className="Save-Button" onClick={this.handleClick}>Save List of Accounts to Disc</button>
-          <ul>{this.state.showAccounts}</ul>
-        </div>
-        </div>
-      </div>
-    );
+
+  render() { 
+      return (
+        // this.state.isLoading ? 
+        // (<div className="App">
+        //         <header className="App-header">
+        //           <img src={logo} className="App-logo" alt="logo" />
+        //         </header>
+        //         <div className="App-body"><div> Loading... </div></div>
+        //     </div>) : (
+          <div className="App">
+            <header className="App-header">
+              <img src={logo} className="App-logo" alt="logo" />
+            </header>
+            <div className="App-body">
+            <div className="Vendor-Section">
+              <button className="View-Button" onClick={this.listVendors}>View List of Vendors</button>
+              <CSVLink data={vendorList} filename={"vendor-details.csv"} target="_blank">
+                <button className="Save-Button">Save Vendor Details</button>
+              </CSVLink>
+              <ul>{this.state.showVendors}</ul>
+            </div>
+            <div className="Account-Section">
+              <button className="View-Button" onClick={this.listAccounts}>View List of Accounts</button>
+              <button className="Save-Button" onClick={this.downloadContacts}>Save Account Details</button>
+              <ul>{this.state.showAccounts}</ul>
+            </div>
+            </div>
+          </div>
+        )
+      // )
+    
   }
 }
 
