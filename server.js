@@ -9,7 +9,7 @@ const config = require('./config.json');
 let xero = new XeroClient(config);
 
 app.get('/accounts', async (req, res) => {
-  const {Accounts} = await xero.accounts.get({where: 'Type=="EXPENSE"'});
+  const {Accounts} = await xero.accounts.get({where: 'Type=="EXPENSE"&&Status=="ACTIVE"'});
 
   res.json( Accounts );
 });
