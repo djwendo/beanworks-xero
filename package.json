@@ -7,8 +7,8 @@
     "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn react_app\""
   },
   "dependencies": {
-    "express": "^4.16.2",
-    "xero-node": "^3.0.6"
+    "express": "^4.17.1",
+    "xero-node": "^3.0.21"
   },
   "devDependencies": {
     "concurrently": "^3.5.0"
